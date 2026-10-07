@@ -1,4 +1,6 @@
-node_modules
 out/*
 !out/plak.mp4
+!out/echoafter_intro.mp4
+!out/echoafter_outro.mp4
+node_modules
 stills
