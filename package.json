@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "studio": "remotion studio",
-    "render": "remotion render src/index.ts MiniDisc out/plak.mp4 --codec=h264 --muted"
+    "render": "remotion render src/index.ts Plak out/plak.mp4 --codec=h264 --muted"
   },
   "dependencies": {
     "@remotion/cli": "4.0.533",
