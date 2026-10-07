@@ -4,8 +4,8 @@ import {AbsoluteFill, interpolate, useCurrentFrame} from 'remotion';
 // ============================================================================
 // AYARLAR — tüm sabitler burada. 1920x1080'e geçmek için WIDTH/HEIGHT'i değiştir.
 // ============================================================================
-export const WIDTH = 1080;
-export const HEIGHT = 1920;
+export const WIDTH = 1920;
+export const HEIGHT = 1080;
 export const FPS = 30;
 export const DURATION = 10; // saniye
 export const DURATION_FRAMES = Math.round(DURATION * FPS);
@@ -13,10 +13,16 @@ export const DURATION_FRAMES = Math.round(DURATION * FPS);
 export const MOTION_ENABLED = true; // süzülme + plak dönüşü
 export const INTRO_ENABLED = true; // kırmızı giriş
 
-// Yerleşim — kenarlarda ve altta şarkı sözleri için boşluk
-const VINYL_DIAMETER_RATIO = 0.62; // ekranın kısa kenarına oranı
-const VINYL_CENTER_X = 0.5; // ekran genişliğine oran
-const VINYL_CENTER_Y = 0.38; // ekran yüksekliğine oran (altta söz alanı kalır)
+// Yerleşim — ekran yatayda (1 + SPACE_RATIO) parçaya bölünür: solda SPACE_RATIO parça boşluk
+// (şarkı sözleri için), en sağdaki 1 parçada plak. Plak hareket ederken bu sütundan taşmaz.
+const SPACE_RATIO = 3; // sol boşluk : plak sütunu = 3 : 1
+const VINYL_COLUMN_FILL = 0.82; // plak çapı / plak sütunu genişliği
+const VINYL_CENTER_Y = 0.5; // ekran yüksekliğine oran
+
+// Renkler — hüzünlü, soluk gece mavisi tonlar
+const BG_CENTER = '#2e3b4f'; // arka plan (plağın arkasında hafif aydınlık)
+const BG_EDGE = '#121821';
+const VINYL_TINT = ['#070a0f', '#0c1119', '#111823', '#1a2230']; // merkezden kenara
 
 // Plak detayları
 const GROOVE_COUNT = 110; // ince oluk sayısı
@@ -27,8 +33,9 @@ const GROOVE_OUTER = 0.975;
 const SHEEN_ANGLE = -135; // sabit ışık yansımasının açısı (derece, sol üst)
 const SHEEN_OPACITY = 0.42;
 const SHEEN_WIDTH = 15; // yansıma kamasının yarı açısı (derece)
-const LABEL_BASE = '#e8dcc0';
-const LABEL_ACCENT = '#c8642c';
+const LABEL_BASE = '#9fb0c2'; // tozlu mavi etiket
+const LABEL_ACCENT = '#3d4f68';
+const LABEL_SUN = ['#dfe5ec', '#b4c2d1']; // soluk ay/güneş
 
 // Dönüş: hız(t) = ROT_BASE + ROT_AMP * sin(2π t / ROT_PERIOD + ROT_PHASE)  [derece/sn]
 export const ROT_BASE = 18;
@@ -38,9 +45,9 @@ export const ROT_PHASE = 0.6;
 export const ROT_DIRECTION = -1; // -1 = saat yönünün tersi (SVG'de pozitif açı saat yönü)
 
 // Süzülme (genlikler ve periyotlar)
-const FLOAT_X = 6; // px
-const FLOAT_Y = 5; // px
-const FLOAT_SCALE = 0.025; // ±%2.5
+const FLOAT_X = 12; // px
+const FLOAT_Y = 18; // px
+const FLOAT_SCALE = 0.06; // ±%6
 const FLOAT_PERIODS = [1.7, 4.1, 5.3]; // sn
 
 // Giriş / çıkış zamanlaması (sn)
@@ -130,12 +137,12 @@ const Label: React.FC<{R: number; id: string; unit: number}> = ({R, id, unit}) =
     <g>
       <defs>
         <radialGradient id={`${id}-lab`} cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#f3ead6" />
+          <stop offset="0" stopColor="#b9c7d5" />
           <stop offset="1" stopColor={LABEL_BASE} />
         </radialGradient>
         <linearGradient id={`${id}-sun`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#e8a050" />
-          <stop offset="1" stopColor={LABEL_ACCENT} />
+          <stop offset="0" stopColor={LABEL_SUN[0]} />
+          <stop offset="1" stopColor={LABEL_SUN[1]} />
         </linearGradient>
         <clipPath id={`${id}-labclip`}>
           <circle r={lr} />
@@ -145,7 +152,7 @@ const Label: React.FC<{R: number; id: string; unit: number}> = ({R, id, unit}) =
       <g clipPath={`url(#${id}-labclip)`}>
         {/* alt yarıda batan güneş ve üç yatay şerit */}
         <circle cx={0} cy={lr * 0.28} r={lr * 0.42} fill={`url(#${id}-sun)`} />
-        <rect x={-lr} y={lr * 0.3} width={2 * lr} height={lr} fill="#2f2a26" />
+        <rect x={-lr} y={lr * 0.3} width={2 * lr} height={lr} fill="#26313f" />
         <rect x={-lr} y={lr * 0.42} width={2 * lr} height={lr * 0.05} fill={LABEL_ACCENT} opacity={0.85} />
         <rect x={-lr} y={lr * 0.56} width={2 * lr} height={lr * 0.035} fill={LABEL_ACCENT} opacity={0.6} />
         <rect x={-lr} y={lr * 0.68} width={2 * lr} height={lr * 0.025} fill={LABEL_ACCENT} opacity={0.4} />
@@ -174,10 +181,10 @@ const Record: React.FC<{id: string; angle: number; unit: number; R: number}> = (
     <g>
       <defs>
         <radialGradient id={`${id}-vinyl`} cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#060606" />
-          <stop offset="0.7" stopColor="#0d0d0e" />
-          <stop offset="0.97" stopColor="#111113" />
-          <stop offset="1" stopColor="#1a1a1c" />
+          <stop offset="0" stopColor={VINYL_TINT[0]} />
+          <stop offset="0.7" stopColor={VINYL_TINT[1]} />
+          <stop offset="0.97" stopColor={VINYL_TINT[2]} />
+          <stop offset="1" stopColor={VINYL_TINT[3]} />
         </radialGradient>
         {/* ışık oluklu alanda, dışa doğru güçlenir */}
         <radialGradient id={`${id}-ringfade`} cx="0" cy="0" r={R} gradientUnits="userSpaceOnUse">
@@ -215,7 +222,7 @@ const Record: React.FC<{id: string; angle: number; unit: number; R: number}> = (
         </g>
       ))}
       {/* çıkış (run-out) bölgesi: etiket çevresinde pürüzsüz, parlak siyah */}
-      <circle r={R * (GROOVE_INNER - 0.01)} fill="#070707" />
+      <circle r={R * (GROOVE_INNER - 0.01)} fill={VINYL_TINT[0]} />
       <circle r={R * (GROOVE_INNER - 0.01)} fill="none" stroke="#fff" strokeOpacity={0.08} strokeWidth={1 * unit} />
 
       {/* DÖNEN katman: etiket + olukta düzensizlikler */}
@@ -273,7 +280,8 @@ export const Vinyl: React.FC = () => {
   const frame = useCurrentFrame();
   const t = frame / FPS;
   const unit = Math.min(WIDTH, HEIGHT) / 1080;
-  const R = (Math.min(WIDTH, HEIGHT) * VINYL_DIAMETER_RATIO) / 2;
+  const column = WIDTH / (1 + SPACE_RATIO);
+  const R = (column * VINYL_COLUMN_FILL) / 2;
 
   // Plak açısı (kümülatif integral), saat yönünün tersi
   const angle = MOTION_ENABLED ? ROT_DIRECTION * ANGLE_TABLE[Math.min(frame, DURATION_FRAMES)] : 0;
@@ -305,6 +313,10 @@ export const Vinyl: React.FC = () => {
         : interpolate(cross, [0, 1], [INTRO_BLUR_TO, 0]);
     flash = INTRO_FLASH * Math.sin(Math.PI * cross);
   }
+  // arka plan siyahtan hüzünlü tona açılır
+  const bgOpacity = INTRO_ENABLED
+    ? interpolate(t, [INTRO_BLACK_END, INTRO_END], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})
+    : 1;
   const outro = interpolate(t, [DURATION - OUTRO_FADE, DURATION], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
 
   const [rr, rg, rb] = hexToRgb(INTRO_RED);
@@ -314,7 +326,7 @@ export const Vinyl: React.FC = () => {
   const redMatrix = `${0.33 * rr * g} ${0.5 * rr * g} ${0.17 * rr * g} 0 0  ${0.33 * rg * g} ${0.5 * rg * g} ${0.17 * rg * g} 0 0  ${0.33 * rb * g} ${0.5 * rb * g} ${0.17 * rb * g} 0 0  0 0 0 1 0`;
   const flashMatrix = `${b} 0 0 0 0  0 ${b} 0 0 0  0 0 ${b} 0 0  0 0 0 1 0`;
 
-  const cx = WIDTH * VINYL_CENTER_X + fx * unit;
+  const cx = WIDTH - column / 2 + fx * unit;
   const cy = HEIGHT * VINYL_CENTER_Y + fy * unit;
   const transform = `translate(${cx} ${cy}) scale(${fs * introScale})`;
 
@@ -330,7 +342,12 @@ export const Vinyl: React.FC = () => {
             <feColorMatrix type="matrix" values={flashMatrix} />
             {blur > 0.01 && <feGaussianBlur stdDeviation={blur * unit} />}
           </filter>
+          <radialGradient id="bg" cx={WIDTH - column / 2} cy={HEIGHT * VINYL_CENTER_Y} r={WIDTH * 0.85} gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor={BG_CENTER} />
+            <stop offset="1" stopColor={BG_EDGE} />
+          </radialGradient>
         </defs>
+        <rect width={WIDTH} height={HEIGHT} fill="url(#bg)" opacity={outro * bgOpacity} />
         <g opacity={outro} transform={transform} style={{isolation: 'isolate'}}>
           {neutralOpacity > 0.001 && (
             <g opacity={neutralOpacity} filter={flash > 0.001 || blur > 0.01 ? 'url(#vx-neutral)' : undefined}>
