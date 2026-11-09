@@ -8,3 +8,7 @@ stills
 out/gtr_c8/*
 !out/gtr_c8/final/
 public/gtr_c8/audio/music_bed.wav
+!out/tesla_togg/
+out/tesla_togg/*
+!out/tesla_togg/final/
+public/tesla_togg/audio/music_tt.wav

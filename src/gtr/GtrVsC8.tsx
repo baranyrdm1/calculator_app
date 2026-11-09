@@ -19,7 +19,7 @@ export const GTR_FPS = 30;
 export const NARRATION_SECONDS = 70.04;
 export const GTR_DURATION = Math.round((NARRATION_SECONDS + 2.4) * GTR_FPS);
 
-const C = {
+export const C = {
   black: '#080A0D',
   charcoal: '#15191F',
   graphite: '#252B32',
@@ -28,8 +28,8 @@ const C = {
   white: '#F2F3F5',
   gray: '#A5ADB7',
 };
-const FONT = "'Space Grotesk', 'Inter', sans-serif";
-const TABULAR: React.CSSProperties = {fontVariantNumeric: 'tabular-nums'};
+export const FONT = "'Space Grotesk', 'Inter', sans-serif";
+export const TABULAR: React.CSSProperties = {fontVariantNumeric: 'tabular-nums'};
 
 const LATIN =
   'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD';
@@ -39,17 +39,17 @@ const fontFace = (w: number, sub: string, range: string) =>
   `@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:${w};src:url(${staticFile(
     `gtr_c8/fonts/space-grotesk-${sub}-${w}-normal.woff2`,
   )}) format('woff2');unicode-range:${range};}`;
-const FONT_CSS = [500, 700]
+export const FONT_CSS = [500, 700]
   .map((w) => fontFace(w, 'latin', LATIN) + fontFace(w, 'latin-ext', LATIN_EXT))
   .join('\n');
 
 // ---------------------------------------------------------------------------
 // Yardımcılar
 // ---------------------------------------------------------------------------
-const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
-const ramp = (t: number, a: number, b: number, e = Easing.out(Easing.cubic)) =>
+export const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+export const ramp = (t: number, a: number, b: number, e = Easing.out(Easing.cubic)) =>
   interpolate(t, [a, b], [0, 1], {...clamp, easing: e});
-const inOut = (t: number, a: number, b: number, fade = 0.35) =>
+export const inOut = (t: number, a: number, b: number, fade = 0.35) =>
   Math.min(ramp(t, a, a + fade), 1 - ramp(t, b - fade, b));
 
 const SCENES = {
@@ -110,7 +110,7 @@ const CAPTIONS: Cap[] = [
 // ---------------------------------------------------------------------------
 // Temel bileşenler
 // ---------------------------------------------------------------------------
-const Background: React.FC<{t: number}> = ({t}) => {
+export const Background: React.FC<{t: number}> = ({t}) => {
   const sweep = ((t * 0.07) % 1.4) - 0.2;
   return (
     <AbsoluteFill style={{background: C.black}}>
@@ -138,7 +138,7 @@ const Background: React.FC<{t: number}> = ({t}) => {
   );
 };
 
-const Scene: React.FC<{t: number; range: readonly [number, number]; children: React.ReactNode}> = ({
+export const Scene: React.FC<{t: number; range: readonly [number, number]; children: React.ReactNode}> = ({
   t,
   range,
   children,
@@ -182,7 +182,7 @@ const CaptionLayer: React.FC<{t: number}> = ({t}) => {
   );
 };
 
-const Label: React.FC<{
+export const Label: React.FC<{
   x: number;
   y: number;
   text: string;
@@ -208,7 +208,7 @@ const Label: React.FC<{
   </div>
 );
 
-const Chip: React.FC<{x: number; y: number; text: string; p: number; hot?: boolean}> = ({x, y, text, p, hot}) => (
+export const Chip: React.FC<{x: number; y: number; text: string; p: number; hot?: boolean}> = ({x, y, text, p, hot}) => (
   <div
     style={{
       position: 'absolute',
@@ -236,7 +236,7 @@ const Chip: React.FC<{x: number; y: number; text: string; p: number; hot?: boole
 // Araç görselleri
 // ---------------------------------------------------------------------------
 type Fit = {src: string; W: number; cx: number; cy: number; flip?: boolean};
-const IMG_AR = 1152 / 2048;
+export const IMG_AR = 1152 / 2048;
 const place = (f: Fit, pw: number, ph: number, zoom = 1) => {
   const W = f.W * zoom;
   const H = W * IMG_AR;
@@ -258,7 +258,7 @@ const SIDE: Record<'gtr' | 'c8', {beauty: Fit; xray: Fit; eng: [number, number];
   },
 };
 
-const Pulse: React.FC<{x: number; y: number; t: number; p: number; r?: number}> = ({x, y, t, p, r = 46}) => {
+export const Pulse: React.FC<{x: number; y: number; t: number; p: number; r?: number}> = ({x, y, t, p, r = 46}) => {
   const k = (t * 0.9) % 1;
   return (
     <svg style={{position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', overflow: 'visible', opacity: p}}>
@@ -338,7 +338,7 @@ const SidePanel: React.FC<{
 // ---------------------------------------------------------------------------
 // SAHNE 1 – Hook
 // ---------------------------------------------------------------------------
-const FrontPanel: React.FC<{
+export const FrontPanel: React.FC<{
   src: string;
   y: number;
   h: number;
