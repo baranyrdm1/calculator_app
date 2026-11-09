@@ -4,9 +4,11 @@ import {MiniDisc, WIDTH, HEIGHT, FPS, DURATION_FRAMES} from './MiniDisc';
 import * as V from './Vinyl';
 import * as F from './FlowerDisc';
 import * as E from './EchoAfter';
+import {GtrVsC8, GTR_W, GTR_H, GTR_FPS, GTR_DURATION} from './gtr/GtrVsC8';
 
 export const RemotionRoot: React.FC = () => (
   <>
+    <Composition id="GtrVsC8" component={GtrVsC8} width={GTR_W} height={GTR_H} fps={GTR_FPS} durationInFrames={GTR_DURATION} />
     <Composition id="EchoAfterIntro" component={E.EchoIntro} width={E.WIDTH} height={E.HEIGHT} fps={E.FPS} durationInFrames={E.INTRO_FRAMES} />
     <Composition id="EchoAfterOutro" component={E.EchoOutro} width={E.WIDTH} height={E.HEIGHT} fps={E.FPS} durationInFrames={E.OUTRO_FRAMES} />
     <Composition id="Plak" component={F.FlowerDisc} width={F.WIDTH} height={F.HEIGHT} fps={F.FPS} durationInFrames={F.DURATION_FRAMES} />

@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "studio": "remotion studio",
-    "render": "remotion render src/index.ts Plak out/plak.mp4 --codec=h264 --muted"
+    "render": "remotion render src/index.ts Plak out/plak.mp4 --codec=h264 --muted",
+    "render:gtr": "remotion render src/index.ts GtrVsC8 out/gtr_c8/video_silent.mp4 --codec=h264 --muted --crf=16"
   },
   "dependencies": {
+    "@fontsource/space-grotesk": "^5.3.0",
     "@remotion/cli": "4.0.533",
     "@remotion/fonts": "4.0.533",
     "@remotion/google-fonts": "4.0.533",

@@ -4,3 +4,7 @@ out/*
 !out/echoafter_outro.mp4
 node_modules
 stills
+!out/gtr_c8/
+out/gtr_c8/*
+!out/gtr_c8/final/
+public/gtr_c8/audio/music_bed.wav
